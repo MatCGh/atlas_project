@@ -14,7 +14,7 @@ pagination_limit = 1000  # Limite de pagination pour les requêtes
 #Dictionnaire des indicateurs
 indicators = {
     "population": "SP_POP_TOTL",
-    "surface_area": "AG_LND_TOTL_K2",
+    "land_area_km2": "AG_LND_TOTL_K2",
     "gdp_per_capita_ppp_current": "NY_GDP_PCAP_PP_CD",
     "gdp_per_capita_usd_current": "NY_GDP_PCAP_CD",
     "life_expectancy": "SP_DYN_LE00_IN",
