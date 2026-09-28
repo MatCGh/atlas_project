@@ -1,0 +1,29 @@
+# Données : on versionne ce qu'on ne peut pas reconstruire
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+# raw/ et external/ ne sont pas ici : ils sont commités (non régénérables à l'identique)
+
+
+journal/
+
+
+# Environnement
+.venv/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Système (Windows)
+Thumbs.db                 
+desktop.ini
+*:Zone.Identifier
+
+
+.vscode/
