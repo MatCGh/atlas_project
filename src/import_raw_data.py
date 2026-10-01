@@ -63,7 +63,7 @@ def get_indicator_data(url, nom, pagination_limit):
 
     return df
 
-# Main loop
+
 def indicators_loop():
     for nom, code in indicators.items():
 
@@ -89,7 +89,7 @@ def area_to_csv():
     except (requests.exceptions.RequestException, ValueError) as e:
             logging.error(f"Error in get_countries: {e}")
 
-
+# Main loop
 def main() :
     indicators_loop()
     area_to_csv()
