@@ -23,15 +23,13 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 def check_columns_presence(df,indicator):
-    KEY.issubset(df.columns)
     missing_key = KEY - set(df.columns)
-    if len(missing_key)!=0:
-        raise ValueError(f"For indicator {indicator}: Missing key column(s) : {missing_key}") #probleme : ne dit pas exactement quelle valeur de la clé manque
-    
-    value_related_columns.issubset(df.columns)
+    if missing_key:
+        raise ValueError(f"For indicator {indicator}: Missing key column(s) : {missing_key}")
+
     missing_value_related = value_related_columns - set(df.columns)
-    if len(missing_value_related)!=0:
-        raise ValueError(f"For indicator {indicator}: Missing value column(s) : {missing_value_related}")  #probleme : ne dit pas exactement quelle valeur manque
+    if missing_value_related:
+        raise ValueError(f"For indicator {indicator}: Missing value column(s) : {missing_value_related}")
 
     # Checking if columns have only 1 value and so, can be dropped
     set_columns_to_check = set(df.columns) - KEY - set([VALUE_COLUMN]) - Allow_non_unique_columns
