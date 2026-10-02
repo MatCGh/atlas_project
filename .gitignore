@@ -25,5 +25,8 @@ Thumbs.db
 desktop.ini
 *:Zone.Identifier
 
-
+# IDE
 .vscode/
+
+# Claude
+ClAUDE.md
