@@ -10,23 +10,21 @@ import sys
 #parameters
 from import_raw_data import start_year, end_year, indicators
 
-key = {"REF_AREA", "TIME_PERIOD"}
-value = 'OBS_VALUE'
-unit_measure = 'UNIT_MEASURE'
-value_related_columns = {value, unit_measure}
+KEY = {"REF_AREA", "TIME_PERIOD"}
+VALUE_COLUMN = 'OBS_VALUE'
+UNIT_COLUMN = 'UNIT_MEASURE'
+value_related_columns = {VALUE_COLUMN, UNIT_COLUMN}
 Allow_non_unique_columns = {"LATEST_DATA"} #Just true or false if it is the latest data that the world bank have for a country or aggregate
 KNOWN_EXTRA_AGGREGATES = ['FCS'] # FCS = Fragile and Conflict-Affected Situations
-
+#PATHS 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 # Functions
 
-def check_year_type(df,indicator):
-    if not isinstance(df['TIME_PERIOD'].iloc[0], (int, np.integer)):
-        raise ValueError(f"For indicator {indicator}: TIME_PERIOD column should contain integer values")
 
 def check_columns_presence(df,indicator):
-    key.issubset(df.columns)
-    missing_key = key - set(df.columns)
+    KEY.issubset(df.columns)
+    missing_key = KEY - set(df.columns)
     if len(missing_key)!=0:
         raise ValueError(f"For indicator {indicator}: Missing key column(s) : {missing_key}") #probleme : ne dit pas exactement quelle valeur de la clé manque
     
@@ -36,10 +34,17 @@ def check_columns_presence(df,indicator):
         raise ValueError(f"For indicator {indicator}: Missing value column(s) : {missing_value_related}")  #probleme : ne dit pas exactement quelle valeur manque
 
     # Checking if columns have only 1 value and so, can be dropped
-    set_columns_to_check = set(df.columns) - key - set([value]) - Allow_non_unique_columns
+    set_columns_to_check = set(df.columns) - KEY - set([VALUE_COLUMN]) - Allow_non_unique_columns
     nu = df[list(set_columns_to_check)].nunique()
     if not (nu <= 1).all():
         raise ValueError(f"For indicator {indicator}: Non key or value columns have more than 1 value. They should be checked before dropping. Columns : {nu[nu > 1].to_dict()}")
+
+def check_year_type(df, indicator):
+    if not pd.api.types.is_integer_dtype(df["TIME_PERIOD"]):
+        raise ValueError(
+            f"For indicator {indicator}: TIME_PERIOD should be an integer column "
+            f"(got dtype {df['TIME_PERIOD'].dtype})"
+        )
 
 def check_key_unicity(df,indicator):
 
@@ -96,21 +101,21 @@ def create_interim_dataset(df_all_indicators):
     df_all_indicators.columns = [x.lower() for x in df_all_indicators.columns]
     df_all_indicators = df_all_indicators.rename(columns={'land_area_km2_km2' : 'land_area_km2'})
 
-    df_all_indicators.to_csv(Path(__file__).resolve().parent.parent / f"data/interim/interim_dataset.csv", index=False)
+    df_all_indicators.to_csv(PROJECT_ROOT / f"data/interim/interim_dataset.csv", index=False)
         
 # Main
 def main():
 
     # Reading the area data and filtering out aggregates to keep only countries
     #df_countries will be used to filter the dataframes of each indicator to keep only countries and not aggregates
-    df_area = pd.read_csv(Path(__file__).resolve().parent.parent /f"data/external/area_data.csv")
+    df_area = pd.read_csv(PROJECT_ROOT / f"data/external/area_data.csv")
     df_countries = df_area[df_area['region.value']!= 'Aggregates']
 
     # Creating the squeleton of the final dataset (all indicators)
     df_all_indicators = dataset_squeleton(df_countries)
 
     for indicator, code in indicators.items():
-        df = pd.read_csv(Path(__file__).resolve().parent.parent /f"data/raw/{indicator}_{start_year}-{end_year}_raw.csv")
+        df = pd.read_csv(PROJECT_ROOT /f"data/raw/{indicator}_{start_year}-{end_year}_raw.csv")
 
         #Controls on the data before merging it to the final dataset
         check_year_type(df, indicator)
