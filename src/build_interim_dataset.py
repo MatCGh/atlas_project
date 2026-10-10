@@ -132,8 +132,6 @@ def main():
     create_interim_dataset(df_all_indicators)
 
 
-
-
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     try:
