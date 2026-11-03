@@ -9,9 +9,9 @@ logging.basicConfig(level=logging.INFO)
 #parameters
 start_year = 2000
 end_year = 2024
-pagination_limit = 1000  # Limite de pagination pour les requêtes
+pagination_limit = 1000  # Pagination limit for requests
 
-#Dictionnaire des indicateurs
+#Indicators
 indicators = {
     "population": "SP_POP_TOTL",
     "land_area_km2": "AG_LND_TOTL_K2",
@@ -28,22 +28,22 @@ indicators = {
 database_id = "WB_WDI"
 
 
-#fonctions
+#functions
 def get_page(url, params):
     response = requests.get(url, params, timeout=10)
     response.raise_for_status()
     return response.json()
 
-def get_indicator_data(url, nom, pagination_limit):
+def get_indicator_data(url, name, pagination_limit):
     # first page data
     data = get_page(url, params={"skip": 0})
 
     # Test if we have data
     if data["count"] == 0:
-        raise ValueError(f"No data found for {nom}")
+        raise ValueError(f"No data found for {name}")
 
     n = math.ceil(data["count"]/pagination_limit)
-    logging.info(f"Number of pages for {nom} : {n}")
+    logging.info(f"Number of pages for {name} : {n}")
     
     # other pages data
     for i in range(1,n):
@@ -59,22 +59,22 @@ def get_indicator_data(url, nom, pagination_limit):
     df=pd.DataFrame(data['value'])
     nb_duplicates = df.duplicated().sum()
     if nb_duplicates != 0:
-        raise ValueError(f"Doublons trouvés pour l'indicateur {nom} : {nb_duplicates}")
+        raise ValueError(f"Duplicates found for indicator {name} : {nb_duplicates}")
 
     return df
 
 
 def indicators_loop():
-    for nom, code in indicators.items():
+    for name, code in indicators.items():
 
         url = f"https://data360api.worldbank.org/data360/data?DATABASE_ID={database_id}&INDICATOR={database_id}_{code}&timePeriodFrom={start_year}&timePeriodTo={end_year}"
 
         try:
-            df = get_indicator_data(url, nom, pagination_limit)
-            df.to_csv(Path(__file__).resolve().parent.parent / f"data/raw/{nom}_{start_year}-{end_year}_raw.csv", index=False)
+            df = get_indicator_data(url, name, pagination_limit)
+            df.to_csv(Path(__file__).resolve().parent.parent / f"data/raw/{name}_{start_year}-{end_year}_raw.csv", index=False)
                     
         except (requests.exceptions.RequestException, ValueError) as e:
-            logging.error(f"Error for {nom}: {e}")
+            logging.error(f"Error for {name}: {e}")
             continue
 
 def area_to_csv():

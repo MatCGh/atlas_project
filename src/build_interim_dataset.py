@@ -91,7 +91,7 @@ def merging(df_all_indicators, df_filtre, indicator):
 
     #Calculating coverage of the indicator in the final dataset
     coverage = df_all_indicators[new_col].notna().mean()
-    logger.info(f"{indicator} : couverture {coverage:.1%}")
+    logger.info(f"{indicator} : coverage {coverage:.1%}")
 
     return df_all_indicators
 
